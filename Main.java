@@ -3,15 +3,15 @@ import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
-        // TODO: create your ChainingHashTable using zyBook code
+        // Create your ChainingHashTable using zyBook code
         ChainingHashTable<String, Employee> table = new ChainingHashTable<>(11);
 
-        // TODO: make an ArrayList to store duplicate Employee objects
-        // ArrayList<Employee> duplicates = ...
+        // Make an ArrayList to store duplicate Employee objects
+        ArrayList<Employee> duplicates = new ArrayList<>();
 
-        // TODO: make counters to keep track of total employees and duplicates
-        // int totalLoaded = 0;
-        // int duplicatesFound = 0;
+        // Counters to keep track of total employees and duplicates
+        int totalLoaded = 0;
+        int duplicatesFound = 0;
 
         try (BufferedReader br = new BufferedReader(new FileReader("Employee_data.csv"))) {
             String line = br.readLine(); // skip header
@@ -29,33 +29,44 @@ public class Main {
                         parseMoney(cols[5])
                 );
 
-                // TODO: increment your total counter
+                // Increment your total counter
+                totalLoaded++;
 
                 // Create the hash key using last + first name
-                String key = (emp.lastName + emp.firstName).toLowerCase();
+                String key = (emp.getLastName() + emp.getFirstName()).toLowerCase();
 
-                // TODO: use table.get(key) to see if an employee already exists
-                // if it exists, and it’s the same department, treat it as a duplicate
-                // otherwise insert into the hash table
-
-                // Example:
-                // Employee existing = table.get(key);
-                // if (existing != null) {
-                //     if (existing.department.equalsIgnoreCase(emp.department)) {
-                //         duplicates.add(emp);
-                //         duplicatesFound++;
-                //     } else {
-                //         table.insert(key, emp);
-                //     }
-                // } else {
-                //     table.insert(key, emp);
-                // }
+                // Check for duplicates
+                Employee existing = table.get(key);
+                if (existing != null) {
+                    if (existing.getDepartment().equalsIgnoreCase(emp.getDepartment())) {
+                        // Duplicate found
+                        duplicates.add(emp);
+                        duplicatesFound++;
+                    } else {
+                        // Same name but different department → insert normally
+                        table.insert(key, emp);
+                    }
+                } else {
+                    // No existing employee → insert normally
+                    table.insert(key, emp);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        // TODO: print total employees, duplicates found, and duplicate list
+        // Print results
+        System.out.println("Total employees loaded: " + totalLoaded);
+        System.out.println("Duplicates found: " + duplicatesFound);
+
+        if (!duplicates.isEmpty()) {
+            System.out.println("Duplicate list:");
+            for (Employee dup : duplicates) {
+                System.out.println(dup);
+            }
+        } else {
+            System.out.println("No duplicates found.");
+        }
     }
 
     // helper for cleaning up salary strings
